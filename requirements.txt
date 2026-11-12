@@ -1,0 +1,7 @@
+# PC / training environment (Python 3.11)
+mujoco==4.0.1
+numpy
+pillow
+gymnasium
+# Added in later phases:
+# torch (CPU build locally), stable-baselines3, tensorboard, onnx, onnxruntime, opencv-contrib-python (ArUco), pyyaml
