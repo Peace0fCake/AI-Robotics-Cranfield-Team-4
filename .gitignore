@@ -1,12 +1,42 @@
+# Python
 venv/
+.venv/
 __pycache__/
 *.pyc
+*.egg-info/
+.pytest_cache/
 .ipynb_checkpoints/
-runs/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local settings and secrets
+.env
+
+# Generated outputs (previews, renders, logs)
+scripts/out/
+*.log
+
+# Datasets: generated samples and labels go in data/, never committed
 data/*
 !data/.gitkeep
-*.onnx
-*.pt
-scripts/out/
-.vscode/
+datasets/
 
+# Training runs and checkpoints (Ultralytics also writes to runs/)
+runs/
+checkpoints/
+wandb/
+*.ckpt
+
+# Model weights and exports (share through a drive, not git)
+*.pt
+*.pth
+*.onnx
+*.engine
+*.tflite
+*_ncnn_model/
+*_openvino_model/

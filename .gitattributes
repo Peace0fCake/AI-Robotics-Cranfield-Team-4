@@ -1,0 +1,8 @@
+# Store text files with LF in the repo; each machine checks them out in its own style.
+* text=auto
+
+# Binary assets: never convert or diff
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
