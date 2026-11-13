@@ -1,0 +1,141 @@
+# Arena geometry for the MuJoCo scene. Units: metres, z up, origin at arena centre.
+# x runs along the 3 m length, y across the 1.5 m width (proposed, Q10).
+# Values marked UNCONFIRMED are stand-ins until measured (docs/PROJECT_GUIDE.md, section 11).
+
+arena:
+  length_x: 3.0
+  width_y: 1.5
+
+layout:
+  # The robot starts on the first plaque (west, by the box end wall) and drives
+  # towards +x; obstacles are on the middle and east plaques; the run ends when
+  # the robot crosses the black line on the east plaque.
+  start_end: west
+  clear_zone: 1.0         # the whole first plaque has no obstacles
+  start:
+    x: -1.0               # centre of the first plaque
+    x_jitter: [-0.15, 0.15]   # random offset around the centre; a guess
+    y_jitter: [-0.20, 0.20]   # a guess
+    yaw_deg: [-10.0, 10.0]    # 0 = facing +x, down the arena towards the line; a guess
+  finish_line_x: 1.45     # black tape, about 5 cm in from the east plaque's outer edge; estimated from the photo
+
+floor:
+  plaques: 3             # laid along x, seams every 1 m
+  thickness: 0.01
+  textures:               # one per plaque, in order of increasing x
+    - assets/textures/floor/floor_plain.png          # west plaque, start, by the box end
+    - assets/textures/floor/floor_plain_mirror.png   # middle plaque: no photo yet, mirrored copy
+    - assets/textures/floor/floor_blackline.png      # east plaque, finish line near its +x edge
+
+walls:
+  # per side: "flat" (type A), "boxes" (type B) or "open" (no wall)
+  # Layout below follows the first arena photo (temporary location); Q21.
+  sides:
+    north: flat           # +y, building wall with trunking, windows above
+    south: boxes          # -y
+    west: boxes           # -x
+    east: open            # +x, black line sticker then carpet; UNCONFIRMED
+  flat:
+    # Temporary location: trunking under the window. Sizes estimated from the
+    # photo using the standard 146 mm socket plate as the scale; UNCONFIRMED (Q21).
+    height: 0.26          # floor to the front edge of the sill
+    thickness: 0.02       # modelling choice, not a real dimension
+    texture: assets/textures/background/wall_trunking_tile.png
+    tile_width: 0.38      # one texture repeat along the wall, in metres
+  window_strip: assets/textures/background/window_strip.png   # view above the flat wall
+  box:
+    # Measured 36 x 26 x 12 cm. Standing on the 36 x 12 face (assumed, as in the photos).
+    length: 0.36          # A, along the wall
+    thickness: 0.12       # C, depth away from the arena
+    height: 0.26          # B, vertical
+    # Per-episode placement error, to imitate boxes put down by hand.
+    jitter:
+      along: [-0.015, 0.015]   # shift along the wall, metres
+      out: [0.0, 0.02]         # shift away from the arena (never into it)
+      yaw_deg: [-4.0, 4.0]
+    sticker_prob: 0.35         # chance the inward face is the one with the sticker; a guess
+    textures:
+      big_sticker: assets/textures/boxes/box_big_sticker.png   # A x B
+      big_plain: assets/textures/boxes/box_big_plain.png       # A x B
+      top: assets/textures/boxes/box_top.png                   # A x C
+      end: assets/textures/boxes/box_end.png                   # C x B
+
+panes:
+  # A pane is layers on one body (D-015): a white paper sheet with the printed
+  # picture on BOTH faces. The back shows the same picture, not mirrored.
+  thickness: 0.002        # paper sheet
+  image_thickness: 0.001  # picture layer
+  image_offset: 0.0008    # picture centre out from the paper centre (+ front, - back), so only its outer face shows
+  base_height: 0.0        # gap between floor and bottom edge of the paper, UNCONFIRMED (Q19)
+  max_count: 6            # panes pre-allocated in the model = 3 classes x 2
+  count_per_class: [1, 2] # each episode has 1 or 2 of every class
+  placement:              # panes go anywhere outside the clear zone (layout.clear_zone)
+    wall_margin: 0.12     # minimum distance from pane centre to any wall; a guess
+    min_spacing: 0.30     # minimum distance between pane centres; a guess
+
+  # Per-episode randomisation. The paper height per class is set below; the
+  # picture fills what the margins leave, at the texture's aspect ratio.
+  # Margin ranges are guesses until the papers are measured (Q19).
+  paper:
+    height_scale: [0.95, 1.0]     # class paper_height is the maximum
+    margin_side: [0.01, 0.03]     # white border left and right of the picture, each side, metres
+    margin_top: [0.01, 0.03]
+    margin_bottom: [0.01, 0.03]
+  pose:
+    pitch_deg: [-15.0, 15.0]      # leaning back / forward about the bottom edge
+    roll_deg: [-5.0, 5.0]
+    # Yaw 0 = the sheet stands square across the arena, facing the start end
+    # (and, being two-sided, the back wall as well).
+    yaw_deg: [-15.0, 15.0]
+    yaw_wide_prob: 0.1            # "usually" facing: now and then one is turned further
+    yaw_wide_deg: [-60.0, 60.0]
+
+  # paper_height: maximum height of the SHEET, compared against a Pixel 8 Pro
+  # standing upright (Q19). Building = full phone height (162.6 mm, published
+  # spec). Human = bottom edge of the camera bar, car = bottom of the power
+  # button: those two are estimates of where those features sit on the phone;
+  # measure them with a ruler.
+  # aspect: picture width / height, from the prepared texture.
+  # Printed in black and white, so the textures are greyscale.
+  classes:
+    human:
+      texture: assets/textures/panes/pane_human.png
+      paper_height: 0.130   # ESTIMATE
+      aspect: 0.359
+    car:
+      texture: assets/textures/panes/pane_car.png
+      paper_height: 0.105   # ESTIMATE
+      aspect: 1.466
+    building:
+      texture: assets/textures/panes/pane_building.png
+      paper_height: 0.163
+      aspect: 0.551
+
+robot:
+  # Measured 2026-11-10 with a phone measuring app, about +/- 1 cm.
+  # Front-wheel steering, rear-wheel drive (car-like). Robot frame: x forward,
+  # origin at the FRONT BUMPER, so every offset below is negative or zero.
+  length: 0.28            # rear of the power bank to the front bumper
+  width: 0.17             # widest point, the front bumper
+  collision_length: 0.30  # padded envelope used for collision checks (D-017)
+  collision_width: 0.20
+  wheelbase: 0.15         # front axle to rear (driven) axle
+  front_axle_x: -0.08     # front (steering) axle behind the bumper; rear axle = front_axle_x - wheelbase = -0.23
+  min_turn_radius: 0.50   # at full lock, "around 50 cm"; taken as measured at the rear-axle centre (Q2)
+  # max_steer_deg follows from the bicycle model: atan(wheelbase / min_turn_radius) = about 16.7 deg.
+  # How the servo command maps to the wheel angle is not calibrated yet (Q2).
+  camera_x: -0.13         # lens, behind the bumper
+  ultrasonic:
+    pivot_x: -0.08        # servo rotation axis, behind the bumper
+    radius: 0.02          # sensor face sits 2 cm in front of the axis (about 6 cm behind the bumper facing forward)
+    height: 0.115
+  line_sensor_ahead_of_front_axle: 0.05
+
+camera:
+  name: robot_cam
+  height: 0.145           # measured lens height above the floor (corrected from 0.16)
+  tilt_deg: 0.0           # positive = pitched down; fixed level mount, real offset unmeasured (Q4)
+  crop_rows: [96, 192]    # rows kept for the CNN after rendering: bottom half, 256x96 (Q11)
+  fovy_deg: 41.0          # VERTICAL FOV, unchanged by the 4:3 crop. Horizontal becomes about 53 deg (was 66 at 16:9)
+  render_width: 256       # 4:3, central full-height crop of the 16:9 sensor (D-014)
+  render_height: 192
