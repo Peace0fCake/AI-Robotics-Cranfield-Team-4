@@ -1,0 +1,5 @@
+# Robot runtime (Raspberry Pi 5): detector benchmark, frame capture.
+# picamera2 comes with Raspberry Pi OS (apt: python3-picamera2); create the venv with --system-site-packages to use it.
+numpy
+pillow
+onnxruntime

@@ -3,6 +3,8 @@ mujoco==4.0.1
 numpy
 pillow
 gymnasium
+ultralytics
+onnxruntime
 pyyaml
 # Added in later phases:
 # torch (CPU build locally), stable-baselines3, tensorboard, onnx, onnxruntime, opencv-contrib-python (ArUco)

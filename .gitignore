@@ -40,3 +40,11 @@ wandb/
 *.tflite
 *_ncnn_model/
 *_openvino_model/
+
+# Square copies of textures made by sim/arena.py
+assets/textures/_cache/
+
+# Lab photos: only the sources used by scripts are tracked (make_lab_walls.py, make_carpet_texture.py)
+assets/textures/raw/lab/*
+!assets/textures/raw/lab/lab_wall_sockets_1.jpg
+!assets/textures/raw/lab/lab_floor_low_4.jpg
